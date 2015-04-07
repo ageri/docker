@@ -1,4 +1,4 @@
-FROM debian
+FROM debian:jessie
 MAINTAINER Daniel Miyagi <daniel.miyagi@ageri.com.br>
 
 RUN apt-get update && apt-get upgrade -y && apt-get install vim -y
@@ -16,20 +16,19 @@ RUN tar xzf ${Z_SRC}/${Z_PKG} -C ${Z_SRC}
 # patch para iniciar o processo do zabbix_server em foreground https://support.zabbix.com/browse/ZBXNEXT-611
 RUN apt-get install build-essential libmysqlclient-dev snmp libsnmp-dev snmpd libcurl4-openssl-dev fping -y && \
 	cd ${Z_SRC}/zabbix-${Z_VERSION} && \
-	patch -p0 < ${Z_SRC}/zabbix-2.4.0-run_foreground.patch && \
 	./configure --enable-server --with-mysql --with-ssh2 --with-net-snmp --with-libcurl --prefix=${Z_HOME} && \
 	make install && \ 
-	cp ${Z_SRC}/zabbix-${Z_VERSION}/misc/init.d/debian/zabbix-server /etc/init.d/ && \
 	chmod +x /etc/init.d/zabbix-server
 RUN useradd --system --no-create-home --shell /bin/false zabbix
-RUN sed -i s:/usr/local:${Z_HOME}:g /etc/init.d/zabbix-server
 
 RUN mkdir -p /var/log/zabbix /var/run/zabbix && chown zabbix:zabbix /var/log/zabbix /var/run/zabbix
 RUN apt-get clean
 ADD ./conf/zabbix_server.conf ${Z_HOME}/etc/zabbix_server.conf
+ADD .sh/zabbix.sh ${Z_HOME}/sbin/zabbix.sh
 
 ENV PATH /opt/zabbix/sbin:$PATH
 
 EXPOSE 5000
-CMD ["/opt/zabbix/sbin/zabbix_server", "-f", " -c", "/opt/zabbix/etc/zabbix_server.conf"]
+VOLUME /var/log/zabbix
+CMD ["/opt/zabbix/sbin/zabbix.sh"]
 
