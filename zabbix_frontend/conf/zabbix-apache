@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+#site redireciona para up.vw.com.br
+	ServerAdmin suporte@ageriservicos.com.br
+	DocumentRoot /opt/zabbix/frontend
+
+	ErrorLog ${APACHE_LOG_DIR}/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel error
+
+	CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+</VirtualHost>
+
