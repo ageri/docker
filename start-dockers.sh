@@ -65,6 +65,7 @@ case $1 in
 	zabbix;;	
 
 	*)
+
 	echo "Opcoes (mysql|1), (zabbix|2), (frontend|3) ou (all|4)."
 esac
 
